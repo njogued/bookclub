@@ -30,6 +30,43 @@ const createUser = (req, res) => {
   });
 };
 
+// login a user
+const loginUser = (req, res) => {
+  const { username, password } = req.body;
+
+  User.findOne({ username }, (err, user) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    bcrypt.compare(password, user.password, (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      if (!result) {
+        return res
+          .status(401)
+          .json({ message: "Invalid username or password" });
+      }
+
+      // Passwords match, generate JWT token and send it to the client
+      const token = jwt.sign(
+        { username: user.username },
+        process.env.JWT_SECRET
+      );
+
+      res.json({ token });
+    });
+  });
+};
+
 //get all users
 const allUsers = (req, res) => {
   User.find({}, (err, users) => {
@@ -100,4 +137,5 @@ module.exports = {
   userByUsername,
   updateUserByUsername,
   deleteUserByUsername,
+  loginUser,
 };
