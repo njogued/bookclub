@@ -4,3 +4,5 @@ const app = express();
 const mongoose = require("mongoose");
 
 mongoose.connect(process.env.DB_URL);
+
+app.listen(3000)
