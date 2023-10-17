@@ -1,95 +1,105 @@
-const mongoose = require("mongoose");
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { User } = require("../models");
 
 // create a new user
 
-const createUser = (req, res) => {
-  const { name, username, email, phone, password } = req.body;
-  bcrypt.hash(password, 10, (err, hashedPassword) => {
-    if (err) {
-      console.error("Error hashing password:", err);
-      return res.status(500).json({ error: "Failed to hash password" });
-    }
-  });
-  const newUser = new User({
-    name,
-    username,
-    email,
-    phone,
-    password: hashedPassword,
-  });
+const refreshTokens = [];
 
-  newUser.save((err, SavedUser) => {
-    if (err) {
-      console.error("Error creating user:", err);
-      res.status(500).json({ error: "Failed to create user" });
-    } else {
-      res.status(201).json(SavedUser);
-    }
-  });
+const createUser = async (req, res) => {
+  try {
+    const { name, username, email, phone, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      name,
+      username,
+      email,
+      phone,
+      password: hashedPassword,
+    });
+    await newUser.save();
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed to create user" });
+  }
 };
 
 // login a user
-const loginUser = (req, res) => {
-  const { username, password } = req.body;
-
-  User.findOne({ username }, (err, user) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({ message: "Internal Server Error" });
-    }
-
+const loginUser = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    // Find the user asynchronously
+    const user = await User.findOne({ username });
     if (!user) {
-      return res.status(401).json({ message: "Invalid username or password" });
+      return res.status(401).json({ message: "User does not exist" });
     }
 
-    bcrypt.compare(password, user.password, (err, result) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json({ message: "Internal Server Error" });
-      }
+    // Compare passwords using bcrypt.compare as a Promise
+    const result = await bcrypt.compare(password, user.password);
 
-      if (!result) {
-        return res
-          .status(401)
-          .json({ message: "Invalid username or password" });
-      }
+    if (!result) {
+      return res.status(401).json({ error: "Cannot validate" });
+    }
 
-      // Passwords match, generate JWT token and send it to the client
-      const token = jwt.sign(
-        { username: user.username },
-        process.env.JWT_SECRET
-      );
+    if (!result) {
+      return res.status(401).json({ error: "Cannot validate" });
+    }
 
-      res.json({ token });
-    });
-  });
+    // Passwords match, generate JWT token and send it to the client
+    // JWT_SECRET generated using 'require('crypto').randomBytes(64).toString('hex')'
+    const accessToken = jwt.sign(
+      { username: user.username },
+      process.env.ACCESS_SECRET,
+      { expiresIn: "5m" }
+    );
+
+    console.log(accessToken);
+
+    const refreshToken = generateRefreshToken({ username: user.username });
+
+    // Save refreshToken to the user in the database
+    user.refreshToken = refreshToken;
+    await user.save();
+    req.user = user;
+    return res.json({ accessToken, refreshToken });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// logout the user
+const logoutUser = (req, res) => {
+  const refreshToken = req.body.refreshToken;
+  refreshTokens.pop(refreshToken);
+  res.json({ message: "Logged out" });
 };
 
 //get all users
-const allUsers = (req, res) => {
-  User.find({}, (err, users) => {
-    if (err) {
-      res.status(500).json({ error: "Failed to retrieve users" });
-    } else {
-      res.status(200).json(users);
-    }
-  });
+const allUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    if (!users) return res.status(404).json({ error: "No users found" });
+    res.status(200).json(users);
+  } catch {
+    res.status(500).json({ error: "Failed to retrieve users" });
+  }
 };
 
 //get user by username
-const userByUsername = (req, res) => {
-  const username = req.params.username;
-  User.findOne({ username }, (err, user) => {
-    if (err) {
-      return res.status(500).json({ error: "Failed to find user" });
-    }
+const userByUsername = async (req, res) => {
+  try {
+    const username = req.params.username;
+    const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
     res.status(200).json(user);
-  });
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to find user" });
+  }
 };
 
 //update user by username
@@ -131,6 +141,33 @@ const deleteUserByUsername = (req, res) => {
   });
 };
 
+const generateRefreshToken = (user) => {
+  const refreshToken = jwt.sign(user, process.env.REFRESH_SECRET);
+  refreshTokens.push(refreshToken);
+  return refreshToken;
+};
+
+const authorizedMiddleware = (req, res, next) => {
+  const accessToken = req.headers.authorization;
+  if (!accessToken) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+  // if (!refreshTokens.includes(token)) {
+  //   return res
+  //     .status(401)
+  //     .json({ error: "Cannot access this resource. Log in again" });
+  // }
+  jwt.verify(accessToken, process.env.ACCESS_SECRET, (err, user) => {
+    if (err) {
+      console.log(err);
+      return res.status(401).json({ error: "Invalid token" });
+    }
+    req.user = user;
+    console.log(req.user);
+    next();
+  });
+};
+
 module.exports = {
   createUser,
   allUsers,
@@ -138,4 +175,6 @@ module.exports = {
   updateUserByUsername,
   deleteUserByUsername,
   loginUser,
+  logoutUser,
+  authorizedMiddleware,
 };

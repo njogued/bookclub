@@ -1,0 +1,30 @@
+GET http://localhost:3000/user
+
+###
+
+POST http://localhost:3000/user/signup
+Content-Type: application/json
+
+{ "name": "NewUser", "username": "User1", "email": "user@mail.com", "phone": "377211", "password": "obviouspassword" }
+
+###
+
+GET http://localhost:3000/user/User1
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVzZXIxIiwiaWF0IjoxNjk3NTQzODA0LCJleHAiOjE2OTc1NDQxMDR9.Q7MkbpMz4WhRWtQ5m1fjbbbdkHKLcZeLyGK4OrF6IR4
+
+
+
+###
+
+POST http://localhost:3000/user/login
+Content-Type: application/json
+
+{ "username": "User1", "password": "obviouspassword"}
+
+
+###
+
+POST http://localhost:3000/user/logout
+
+Content-Type: application/json
+{"refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVzZXIxIiwiaWF0IjoxNjk3NTQyNzEwfQ.UkWMGaDRgjSi7JqHZtRT3VZdNfre4ARQA0cVoy_7IlY"}
