@@ -4,23 +4,22 @@ const { Book } = require("../models");
 
 // get all books
 const getAllBooks = (req, res) => {
-  allBooks = Book.find({}, (error, books) => {
-    if (error) {
-      // console.error(error)
-      res.status(500).json({ error: "Could not fetch books" });
-    } else {
-      res.status(200).json(books);
-    }
-  });
+  try {
+    const books = Book.find();
+    res.status(200).json(books);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Could not fetch books" });
+  }
 };
 
 // create one book
 const createOneBook = (req, res) => {
   const { title, yop, genre, owner } = req.body;
   if (req.body.image) {
-    const image = req.body.image;
+    var image = req.body.image;
   } else {
-    const image = "";
+    var image = "";
   }
   newBook = new Book({ title, yop, genre, image, owner });
   newBook.save((error, savedBook) => {
