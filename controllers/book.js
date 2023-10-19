@@ -1,11 +1,11 @@
 const { Book } = require("../models");
 
-// methods to crud a book
+// methods to CRUD a book
 
-// get all books
-const getAllBooks = (req, res) => {
+// Get all books
+const getAllBooks = async (req, res) => {
   try {
-    const books = Book.find();
+    const books = await Book.find({});
     res.status(200).json(books);
   } catch (error) {
     console.error(error);
@@ -13,75 +13,70 @@ const getAllBooks = (req, res) => {
   }
 };
 
-// create one book
-const createOneBook = (req, res) => {
-  const { title, yop, genre, owner } = req.body;
-  if (req.body.image) {
-    var image = req.body.image;
-  } else {
-    var image = "";
+// Create one book
+const createOneBook = async (req, res) => {
+  try {
+    const { title, yop, genre, owner, image } = req.body;
+    console.log(title);
+    const newBook = new Book({ title, yop, genre, image, owner });
+    const savedBook = await newBook.save();
+    res.status(201).json(savedBook);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to create a new book resource" });
   }
-  newBook = new Book({ title, yop, genre, image, owner });
-  newBook.save((error, savedBook) => {
-    if (error) {
-      res.status(500).json({ error: "Failed to create a new book resource" });
-    } else {
-      res.status(201).json(savedBook);
-    }
-  });
 };
 
-// find one book
-const findOneBook = (req, res, next) => {
-  Book.findById(req.params.id, (error, book) => {
-    if (error) {
-      res.status(500).json({ error: "Server error, could not fetch the book" });
+// Find one book
+const findOneBook = async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+    if (!book) {
+      res.status(404).json({ error: "The book doesn't exist yet" });
     } else {
-      if (!book) {
-        res.status(404).json({ error: "The book doesn't exist yet" });
-        next();
-      }
       res.status(200).json(book);
     }
-  });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error, could not fetch the book" });
+  }
 };
 
-// update one book
-const updateOneBook = (req, res) => {
-  const id = req.params.id;
-  updateDetails = req.body;
-  Book.findOneAndUpdate(
-    { id },
-    updateDetails,
-    { new: true },
-    (error, updatedBook) => {
-      if (error) {
-        res
-          .status(500)
-          .json({ error: "Server Error. Book could not be updated" });
-      } else {
-        if (!updatedBook) {
-          return res.status(500).json({ error: "Could not find the book" });
-        }
-        res.status(204).json({ message: "Book resource updated" });
+// Update one book
+const updateOneBook = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updateDetails = req.body;
+    const updatedBook = await Book.findOneAndUpdate(
+      { _id: id },
+      updateDetails,
+      {
+        new: true,
       }
+    );
+    if (!updatedBook) {
+      return res.status(404).json({ error: "Could not find the book" });
     }
-  );
+    res.status(200).json(updatedBook);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server Error. Book could not be updated" });
+  }
 };
 
-// delete a book
-const deleteBook = (req, res) => {
-  const id = req.params.id;
-  Book.findByIdAndRemove(id, (error, deletedBook) => {
-    if (error) {
-      res.status(500).json({ error: "Could not delete the book" });
-    } else {
-      if (!deletedBook) {
-        return res.status(404).json({ error: "Could not find the book" });
-      }
-      res.status(200).json(deletedBook);
+// Delete a book
+const deleteBook = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const deletedBook = await Book.findByIdAndRemove(id);
+    if (!deletedBook) {
+      return res.status(404).json({ error: "Could not find the book" });
     }
-  });
+    res.status(204).json(deletedBook);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Could not delete the book" });
+  }
 };
 
 module.exports = {
