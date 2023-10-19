@@ -8,7 +8,7 @@ mongoose.connect(process.env.DB_URL);
 
 // Specify the view engine
 app.set("view engine", "ejs");
-app.use("/static", express.static("public"));
+app.use(express.static("public"));
 app.use(express.json());
 
 app.get("/", (req, res) => {
