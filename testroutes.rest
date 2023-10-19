@@ -1,16 +1,39 @@
 GET http://localhost:3000/user
 
+####
+GET http://localhost:3000/books
 ###
 
 POST http://localhost:3000/user/signup
 Content-Type: application/json
 
 { "name": "NewUser", "username": "User1", "email": "user@mail.com", "phone": "377211", "password": "obviouspassword" }
+###
+POST http://localhost:3000/books
+Content-Type: application/json 
+
+{
+  "title": "Meditations",
+  "yop": "2018",
+  "genre": "fiction",
+  "owner": "6530261f75cd56b7a19ddee5",
+  "image": ""
+}
+
 
 ###
+GET http://localhost:3000/books/65302f431c520bb12ba52a74
 
-GET http://localhost:3000/user/User1
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVzZXIxIiwiaWF0IjoxNjk3NTQzODA0LCJleHAiOjE2OTc1NDQxMDR9.Q7MkbpMz4WhRWtQ5m1fjbbbdkHKLcZeLyGK4OrF6IR4
+####
+PUT http://localhost:3000/books/65302f431c520bb12ba52a74
+Content-Type: application/json
+
+{ 
+  "title": "43 rules"
+}
+
+###
+DELETE  http://localhost:3000/books/65302f431c520bb12ba52a74
 
 
 

@@ -104,41 +104,36 @@ const userByUsername = async (req, res) => {
 
 //update user by username
 
-const updateUserByUsername = (req, res) => {
-  const username = req.params.username; // Capture username from the route parameters
-  const updatedData = req.body;
-
-  User.findOneAndUpdate(
-    { username },
-    updatedData,
-    { new: true },
-    (err, user) => {
-      if (err) {
-        console.error("Error updating user by username:", err);
-        return res.status(500).json({ error: "Failed to update user" });
-      }
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      res.status(200).json(user);
+const updateUserByUsername = async (req, res) => {
+  try {
+    const username = req.params.username; // Capture username from the route parameters
+    const updatedData = req.body;
+    const updatedUser = await User.findOneAndUpdate({username}, updatedData,
+      { new: true });
+    if(!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
     }
-  );
+    return res.status(204).json(updatedUser);
+  }
+  catch(error){
+    console.error("Failed to update user:", error);
+    return res.status(500).json({ error: "Failed to update user" });
+  }
 };
 
 // Delete a user by username
-const deleteUserByUsername = (req, res) => {
-  const username = req.params.username; // Capture username from the route parameters
-
-  User.findOneAndRemove({ username }, (err, user) => {
-    if (err) {
-      console.error("Error deleting user by username:", err);
-      return res.status(500).json({ error: "Failed to delete user" });
-    }
-    if (!user) {
+const deleteUserByUsername = async (req, res) => {
+  try{
+    const username = req.params.username; // Capture username from the route parameters
+    const removedUser = await User.findByIdAndRemove({username});
+    if (!removedUser) {
       return res.status(404).json({ error: "User not found" });
     }
     res.status(204).send(); // User was successfully deleted, no content to return
-  });
+  } catch(error) {
+    console.error("Error deleting user by username:", error);
+    return res.status(500).json({ error: "Failed to delete user" });
+  }
 };
 
 const generateRefreshToken = (user) => {
