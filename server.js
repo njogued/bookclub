@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 mongoose.connect(process.env.DB_URL);
 
@@ -11,11 +12,11 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.render("home");
 });
-
 
 // Import routes
 const bookRoutes = require("./routes/bookRoutes");

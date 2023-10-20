@@ -36,34 +36,27 @@ const loginUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "User does not exist" });
     }
-
     // Compare passwords using bcrypt.compare as a Promise
     const result = await bcrypt.compare(password, user.password);
-
     if (!result) {
       return res.status(401).json({ error: "Cannot validate" });
     }
-
     if (!result) {
       return res.status(401).json({ error: "Cannot validate" });
     }
-
     // Passwords match, generate JWT token and send it to the client
     // JWT_SECRET generated using 'require('crypto').randomBytes(64).toString('hex')'
     const accessToken = jwt.sign(
-      { username: user.username },
+      { username: user.username, id: user.id },
       process.env.ACCESS_SECRET,
       { expiresIn: "5m" }
     );
-
-    console.log(accessToken);
-
     const refreshToken = generateRefreshToken({ username: user.username });
-
+    res.cookie("refresh_token", refreshToken, { httpOnly: true });
     // Save refreshToken to the user in the database
     user.refreshToken = refreshToken;
     await user.save();
-    req.user = user;
+    res.cookie("access_token", accessToken, { httpOnly: true, maxAge: 300000 });
     return res.json({ accessToken, refreshToken });
   } catch (error) {
     console.error(error);
@@ -73,8 +66,8 @@ const loginUser = async (req, res) => {
 
 // logout the user
 const logoutUser = (req, res) => {
-  const refreshToken = req.body.refreshToken;
-  refreshTokens.pop(refreshToken);
+  res.clearCookie("access_cookie");
+  res.clearCookie("refresh_token");
   res.json({ message: "Logged out" });
 };
 
@@ -109,14 +102,14 @@ const updateUserByUsername = async (req, res) => {
   try {
     const username = req.params.username; // Capture username from the route parameters
     const updatedData = req.body;
-    const updatedUser = await User.findOneAndUpdate({username}, updatedData,
-      { new: true });
-    if(!updatedUser) {
+    const updatedUser = await User.findOneAndUpdate({ username }, updatedData, {
+      new: true,
+    });
+    if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
     }
     return res.status(204).json(updatedUser);
-  }
-  catch(error){
+  } catch (error) {
     console.error("Failed to update user:", error);
     return res.status(500).json({ error: "Failed to update user" });
   }
@@ -124,14 +117,14 @@ const updateUserByUsername = async (req, res) => {
 
 // Delete a user by username
 const deleteUserByUsername = async (req, res) => {
-  try{
+  try {
     const username = req.params.username; // Capture username from the route parameters
-    const removedUser = await User.findByIdAndRemove({username});
+    const removedUser = await User.findByIdAndRemove({ username });
     if (!removedUser) {
       return res.status(404).json({ error: "User not found" });
     }
     res.status(204).send(); // User was successfully deleted, no content to return
-  } catch(error) {
+  } catch (error) {
     console.error("Error deleting user by username:", error);
     return res.status(500).json({ error: "Failed to delete user" });
   }
@@ -144,22 +137,18 @@ const generateRefreshToken = (user) => {
 };
 
 const authorizedMiddleware = (req, res, next) => {
-  const accessToken = req.headers.authorization;
+  const accessToken = req.cookies.access_token;
+  console.log(accessToken);
   if (!accessToken) {
     return res.status(401).json({ error: "Not authenticated" });
   }
-  // if (!refreshTokens.includes(token)) {
-  //   return res
-  //     .status(401)
-  //     .json({ error: "Cannot access this resource. Log in again" });
-  // }
   jwt.verify(accessToken, process.env.ACCESS_SECRET, (err, user) => {
     if (err) {
       console.log(err);
       return res.status(401).json({ error: "Invalid token" });
     }
     req.user = user;
-    console.log(req.user);
+    console.log(req.user.id);
     next();
   });
 };

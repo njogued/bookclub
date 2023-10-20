@@ -1,0 +1,61 @@
+<%- include('base_header', { title: 'Add Book' }) -%>
+
+<div class="container-fluid">
+  <form method="post">
+    <div class="form-group">
+      <label for="booktitle">Book Title</label>
+      <input
+        type="text"
+        name="title"
+        class="form-control"
+        id="booktitle"
+        placeholder="Enter Title"
+      />
+      <label for="yop">Book Title</label>
+      <input
+        type="text"
+        name="yop"
+        class="form-control"
+        id="yop"
+        placeholder="Enter Year of Publication"
+      />
+      <div class="mb-3">
+        <label class="form-label">Genres</label>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            value="horror"
+            id="genreHorror"
+            name="genre"
+          />
+          <label class="form-check-label" for="genreHorror">Horror</label>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            value="mystery"
+            id="genreMystery"
+            name="genre"
+          />
+          <label class="form-check-label" for="genreMystery">Mystery</label>
+        </div>
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            value="fantasy"
+            id="genreFantasy"
+            name="genre"
+          />
+          <label class="form-check-label" for="genreFantasy">Fantasy</label>
+        </div>
+        <!-- Add more checkboxes as needed -->
+      </div>
+    </div>
+    <button type="submit">Create Book</button>
+  </form>
+</div>
+
+<%- include('base_footer') -%>
