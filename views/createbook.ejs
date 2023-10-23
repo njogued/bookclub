@@ -1,8 +1,16 @@
 <%- include('base_header', { title: 'Add Book' }) -%>
 
 <div class="container-fluid">
-  <form method="post">
+  <form method="post" class="mx-5 mt-3" enctype="multipart/form-data">
     <div class="form-group">
+      <label for="booktitle">Author</label>
+      <input
+        type="text"
+        name="author"
+        class="form-control"
+        id="author"
+        placeholder="Enter Author"
+      />
       <label for="booktitle">Book Title</label>
       <input
         type="text"
@@ -11,13 +19,20 @@
         id="booktitle"
         placeholder="Enter Title"
       />
-      <label for="yop">Book Title</label>
+      <label for="yop">Year of Publication</label>
       <input
         type="text"
         name="yop"
         class="form-control"
         id="yop"
         placeholder="Enter Year of Publication"
+      />
+      <label for="returnDate">Return Date</label>
+      <input
+        type="date"
+        name="returnDate"
+        class="form-control"
+        id="returnDate"
       />
       <div class="mb-3">
         <label class="form-label">Genres</label>
@@ -51,6 +66,13 @@
           />
           <label class="form-check-label" for="genreFantasy">Fantasy</label>
         </div>
+        <input
+          type="file"
+          class="custom-file-input"
+          id="customFile"
+          name="image"
+        />
+        <label class="custom-file-label" for="customFile">Choose file</label>
         <!-- Add more checkboxes as needed -->
       </div>
     </div>

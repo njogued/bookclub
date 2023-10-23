@@ -2,6 +2,18 @@ const express = require("express");
 const router = express.Router();
 const bookController = require("../controllers/book");
 const { authorizedMiddleware } = require("../controllers/user");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: "images/",
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const fileExtension = file.originalname.split(".").pop(); // Get the file extension
+    cb(null, file.fieldname + "-" + uniqueSuffix + "." + fileExtension);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 // GET all books
 router.get("/", bookController.getAllBooks);
@@ -16,7 +28,7 @@ router.get("/create", authorizedMiddleware, (req, res) => {
 router.get("/:id", bookController.findOneBook);
 
 // POST a new book
-router.post("/create", bookController.createOneBook);
+router.post("/create", upload.single("image"), bookController.createOneBook);
 
 // PUT/update a book by ID
 router.put("/:id", bookController.updateOneBook);

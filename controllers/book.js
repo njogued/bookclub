@@ -16,8 +16,16 @@ const getAllBooks = async (req, res) => {
 // Create one book
 const createOneBook = async (req, res) => {
   try {
-    const { title, yop, genre, owner, image } = req.body;
-    const newBook = new Book({ title, yop, genre, image, owner });
+    const { title, yop, genre, author, owner } = req.body;
+    const image = req.file["path"];
+    const newBook = new Book({
+      title,
+      yop,
+      genre,
+      author,
+      image,
+      owner,
+    });
     const savedBook = await newBook.save();
     res.status(201).json(savedBook);
   } catch (error) {

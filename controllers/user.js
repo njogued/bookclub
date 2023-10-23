@@ -140,7 +140,8 @@ const authorizedMiddleware = (req, res, next) => {
   const accessToken = req.cookies.access_token;
   console.log(accessToken);
   if (!accessToken) {
-    return res.status(401).json({ error: "Not authenticated" });
+    // res.status(401).json({ error: "Not authenticated" });
+    return res.redirect("/user/login");
   }
   jwt.verify(accessToken, process.env.ACCESS_SECRET, (err, user) => {
     if (err) {
