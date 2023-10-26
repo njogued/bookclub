@@ -5,8 +5,16 @@ const { Book } = require("../models");
 // Get all books
 const getAllBooks = async (req, res) => {
   try {
-    const books = await Book.find({});
-    res.status(200).json(books);
+    const perPage = 10; // Number of books to display per page
+    const page = req.query.page || 1; // Get the page number from the query parameters
+
+    const books = await Book.find({})
+      .sort({ created_at: -1 }) // Sort by "created_at" field in descending order (newest first)
+      .skip((page - 1) * perPage)
+      .limit(perPage);
+
+    // Render the "allbooks" view and pass the books and current page to it
+    res.status(200).render("allbooks", { books, currentPage: page, perPage });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Could not fetch books" });

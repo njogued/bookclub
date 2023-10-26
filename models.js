@@ -11,6 +11,9 @@ const bookSchema = new mongoose.Schema({
   inSwap: Boolean,
   returnDate: Date,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+}, 
+{
+  timestamps: true
 });
 
 const Book = mongoose.model("Book", bookSchema);
@@ -33,6 +36,9 @@ const userSchema = new mongoose.Schema({
   reviewsAbout: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
   lookingFor: [String],
   refreshToken: String,
+},
+{
+  timestamps: true
 });
 
 const User = mongoose.model("User", userSchema);
@@ -50,6 +56,9 @@ const Review = mongoose.model("Review", reviewsSchema);
 
 const swapSchema = new mongoose.Schema({
   books: [{ type: mongoose.Schema.Types.ObjectId, ref: "Book" }],
+},
+{
+  timestamps: true
 });
 
 const Swap = mongoose.model("Swap", swapSchema);
