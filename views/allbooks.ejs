@@ -2,33 +2,33 @@
 
 <!-- Display the books -->
 <% books.forEach(book => { %>
-    <div class="card">
-     <img src="<%= book.image %>" class="card-img-top" alt="<%= book.title %>"/>
-      <div class="card-body">
-        <h4 class="card-title"> Tittle </h4>
-        <h5 class="card-title"><%= book.title %></h5>
-        <h4 class="card-title"> Author </h4>
-        <p class="card-text"><%= book.author %></</p>
-        <h4 class="card-title"> Year of Publication </h4>
-        <p class="card-text"><%= book.yop.getFullYear() %></</p>
-        <h4 class="card-title"> Genres </h4>
-        <% for (let i = 0; i < book.genre.length; i++) { %>
-          <p><%= book.genre[i] %></p>
-        <% } %>
-        <h4 class="card-title"> Return Date </h4>
-        <p class="card-text"><%= book.returnDate %></</p>
-        <a href="#!" class="btn btn-primary">Button</a>
-      </div>
-    </div>
+<div class="card">
+  <img src="<%= book.image.split("public")[1] %>" class="card-img-top" alt="<%=
+  book.title %>"/>
+  <div class="card-body">
+    <h4 class="card-title">Title</h4>
+    <h5 class="card-title"><%= book.title %></h5>
+    <h4 class="card-title">Author</h4>
+    <p class="card-text"><%= book.author %></p>
+    <h4 class="card-title">Year of Publication</h4>
+    <p class="card-text"><%= book.yop.getFullYear() %></p>
+    <h4 class="card-title">Genres</h4>
+    <% for (let i = 0; i < book.genre.length; i++) { %>
+    <p><%= book.genre[i] %></p>
+    <% } %>
+    <h4 class="card-title">Return Date</h4>
+    <p class="card-text"><%= book.returnDate %></p>
+    <a href="#!" class="btn btn-primary">Button</a>
+  </div>
+</div>
 <% }) %>
 
 <!-- Pagination links -->
 <div class="pagination">
   <% if (currentPage > 1) { %>
-    <a href="?page=<%= currentPage - 1 %>">Previous</a>
-  <% } %>
-  <% if (books.length === perPage) { %>
-    <a href="?page=<%= currentPage + 1 %>">Next</a>
+  <a href="?page=<%= currentPage - 1 %>">Previous</a>
+  <% } %> <% if (books.length === perPage) { %>
+  <a href="?page=<%= currentPage + 1 %>">Next</a>
   <% } %>
 </div>
 

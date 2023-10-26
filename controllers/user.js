@@ -57,7 +57,7 @@ const loginUser = async (req, res) => {
     user.refreshToken = refreshToken;
     await user.save();
     res.cookie("access_token", accessToken, { httpOnly: true, maxAge: 300000 });
-    return res.json({ accessToken, refreshToken });
+    return res.status(200).redirect("/books");
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
