@@ -1,0 +1,14 @@
+Feature #1: Remove Login and Signup options when a user logs in
+Status: Open
+
+Feature #2: Put request to edit a user profile
+Status: Open
+
+Feature #3: Logic to swap books
+Status: Open
+
+Feature #4: My Books tab in User profile
+Status: Open
+
+Feature #5: Redirections after signing in
+Status: Open

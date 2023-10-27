@@ -1,8 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { User } = require("../models");
-
+const { User, Book } = require("../models");
 
 // create a new user
 
@@ -10,7 +9,7 @@ const refreshTokens = [];
 
 const createUser = async (req, res) => {
   try {
-    const { name, username, email, phone, password} = req.body;
+    const { name, username, email, phone, password } = req.body;
     const image = req.file["path"];
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
@@ -52,7 +51,7 @@ const loginUser = async (req, res) => {
     const accessToken = jwt.sign(
       { username: user.username, id: user.id },
       process.env.ACCESS_SECRET,
-      { expiresIn: "5m" }
+      { expiresIn: "59m" }
     );
     const refreshToken = generateRefreshToken({ username: user.username });
     res.cookie("refresh_token", refreshToken, { httpOnly: true });
@@ -88,12 +87,22 @@ const allUsers = async (req, res) => {
 //get user by username
 const userByUsername = async (req, res) => {
   try {
+    const userBooks = [];
     const username = req.params.username;
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username }).populate("ownedBooks").exec();
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    res.status(200).render('userprofile', {user});
+    // const books = user.ownedBooks;
+    // for (const book of books) {
+    //   console.log(book);
+    //   const bookObj = await Book.findById(book);
+    //   console.log(bookObj);
+    //   userBooks.push(bookObj);
+    // }
+    // console.log(userBooks);
+    console.log(user.ownedBooks);
+    res.status(200).render("userprofile", { user });
   } catch (error) {
     return res.status(500).json({ error: "Failed to find user" });
   }
@@ -141,7 +150,6 @@ const generateRefreshToken = (user) => {
 
 const authorizedMiddleware = (req, res, next) => {
   const accessToken = req.cookies.access_token;
-  console.log(accessToken);
   if (!accessToken) {
     // res.status(401).json({ error: "Not authenticated" });
     return res.redirect("/user/login");
