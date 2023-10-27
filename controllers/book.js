@@ -1,4 +1,4 @@
-const { Book } = require("../models");
+const { Book, User } = require("../models");
 
 // methods to CRUD a book
 
@@ -6,15 +6,24 @@ const { Book } = require("../models");
 const getAllBooks = async (req, res) => {
   try {
     const perPage = 10; // Number of books to display per page
-    const page = req.query.page || 1; // Get the page number from the query parameters
+    let page = req.query.page || 1; // Get the page number from the query parameters
+    let bookAndOwner = {};
 
     const books = await Book.find({})
-      .sort({ created_at: -1 }) // Sort by "created_at" field in descending order (newest first)
+      .sort({ createdAt: -1 }) // Sort by "created_at" field in descending order (newest first)
       .skip((page - 1) * perPage)
       .limit(perPage);
 
+    page = parseInt(page, 10);
+
+    books.forEach(async (book) => {
+      const owner = await User.findById(book.owner);
+      bookAndOwner[book] = owner;
+    });
+    console.log(bookAndOwner);
+
     // Render the "allbooks" view and pass the books and current page to it
-    res.status(200).render("allbooks", { books, currentPage: page, perPage });
+    res.status(200).render("allbooks", { books, page, perPage });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Could not fetch books" });
@@ -24,8 +33,9 @@ const getAllBooks = async (req, res) => {
 // Create one book
 const createOneBook = async (req, res) => {
   try {
-    const { title, yop, genre, author, owner, returnDate } = req.body;
+    const { title, yop, genre, author, returnDate } = req.body;
     const image = req.file["path"];
+    const owner = req.user.id;
     const newBook = new Book({
       title,
       yop,
@@ -35,8 +45,8 @@ const createOneBook = async (req, res) => {
       owner,
       returnDate,
     });
-    const savedBook = await newBook.save();
-    res.status(201).json(savedBook);
+    await newBook.save();
+    res.status(201).redirect("/books");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to create a new book resource" });

@@ -28,7 +28,12 @@ router.get("/create", authorizedMiddleware, (req, res) => {
 router.get("/:id", bookController.findOneBook);
 
 // POST a new book
-router.post("/create", upload.single("image"), bookController.createOneBook);
+router.post(
+  "/create",
+  upload.single("image"),
+  authorizedMiddleware,
+  bookController.createOneBook
+);
 
 // PUT/update a book by ID
 router.put("/:id", bookController.updateOneBook);
