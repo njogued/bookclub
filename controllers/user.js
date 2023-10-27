@@ -3,18 +3,21 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { User } = require("../models");
 
+
 // create a new user
 
 const refreshTokens = [];
 
 const createUser = async (req, res) => {
   try {
-    const { name, username, email, phone, password } = req.body;
+    const { name, username, email, phone, password} = req.body;
+    const image = req.file["path"];
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       name,
       username,
       email,
+      image,
       phone,
       password: hashedPassword,
     });
@@ -90,7 +93,7 @@ const userByUsername = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    res.status(200).json(user);
+    res.status(200).render('userprofile', {user});
   } catch (error) {
     return res.status(500).json({ error: "Failed to find user" });
   }
