@@ -12,16 +12,11 @@ const getAllBooks = async (req, res) => {
     const books = await Book.find({})
       .sort({ createdAt: -1 }) // Sort by "created_at" field in descending order (newest first)
       .skip((page - 1) * perPage)
-      .limit(perPage);
+      .limit(perPage)
+      .populate("owner")
+      .exec();
 
     page = parseInt(page, 10);
-
-    books.forEach(async (book) => {
-      const owner = await User.findById(book.owner);
-      bookAndOwner[book] = owner;
-    });
-    console.log(bookAndOwner);
-
     // Render the "allbooks" view and pass the books and current page to it
     res.status(200).render("allbooks", { books, page, perPage });
   } catch (error) {
@@ -45,6 +40,11 @@ const createOneBook = async (req, res) => {
       owner,
       returnDate,
     });
+    await User.findByIdAndUpdate(
+      owner,
+      { $push: { ownedBooks: newBook.id } },
+      { new: true, useFindAndModify: false }
+    );
     await newBook.save();
     res.status(201).redirect("/books");
   } catch (error) {

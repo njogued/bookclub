@@ -13,6 +13,12 @@
           <div class="card-body">
             <h5>Title: <%= book.title %></h5>
             <h5>Author: <%= book.author %></h5>
+            <p>
+              Book Owner:
+              <a href="/user/<%= book.owner.username %>"
+                ><%= book.owner.name %></a
+              >
+            </p>
             <p>Year of Publication: <%= book.yop.getFullYear() %></p>
             <p>
               Genres: <% for (let i = 0; i < book.genre.length; i++) { %> <%=

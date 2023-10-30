@@ -87,23 +87,15 @@ const allUsers = async (req, res) => {
 //get user by username
 const userByUsername = async (req, res) => {
   try {
-    const userBooks = [];
     const username = req.params.username;
     const user = await User.findOne({ username }).populate("ownedBooks").exec();
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    // const books = user.ownedBooks;
-    // for (const book of books) {
-    //   console.log(book);
-    //   const bookObj = await Book.findById(book);
-    //   console.log(bookObj);
-    //   userBooks.push(bookObj);
-    // }
-    // console.log(userBooks);
     console.log(user.ownedBooks);
     res.status(200).render("userprofile", { user });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ error: "Failed to find user" });
   }
 };

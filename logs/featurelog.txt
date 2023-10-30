@@ -12,3 +12,6 @@ Status: Open
 
 Feature #5: Redirections after signing in
 Status: Open
+
+Feature #6: Public user profile
+Status: Open
