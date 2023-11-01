@@ -7,7 +7,6 @@ const getAllBooks = async (req, res) => {
   try {
     const perPage = 10; // Number of books to display per page
     let page = req.query.page || 1; // Get the page number from the query parameters
-    let bookAndOwner = {};
 
     const books = await Book.find({})
       .sort({ createdAt: -1 }) // Sort by "created_at" field in descending order (newest first)
