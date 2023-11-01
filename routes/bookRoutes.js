@@ -35,6 +35,12 @@ router.post(
   bookController.createOneBook
 );
 
+//POST swap a book
+router.post(
+  "/createswap",
+  authorizedMiddleware,
+  bookController.swapBook
+)
 // PUT/update a book by ID
 router.put("/:id", bookController.updateOneBook);
 

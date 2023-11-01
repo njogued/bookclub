@@ -7,8 +7,8 @@ const bookSchema = new mongoose.Schema({
   genre: [String],
   image: String,
   author: String,
-  ifAvailable: Boolean,
-  inSwap: Boolean,
+  ifAvailable: {type: Boolean, default: true},
+  inSwap: {type: Boolean, default: false},
   returnDate: Date,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 }, 
@@ -57,6 +57,7 @@ const Review = mongoose.model("Review", reviewsSchema);
 
 const swapSchema = new mongoose.Schema({
   books: [{ type: mongoose.Schema.Types.ObjectId, ref: "Book" }],
+  status: {type: Number, default: 0}
 },
 {
   timestamps: true

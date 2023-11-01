@@ -1,4 +1,4 @@
-const { Book, User } = require("../models");
+const { Book, User, Swap} = require("../models");
 
 // methods to CRUD a book
 
@@ -90,6 +90,20 @@ const updateOneBook = async (req, res) => {
   }
 };
 
+//swap a book
+
+const swapBook = async (req, res) => {
+  try{
+    const {book1, book2} = req.body;
+    const newSwap = new Swap({book1, book2});
+    await newSwap.save();
+    res.status(201).json({message: "swap initiated"}); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Swap could not be initiated" });
+  }
+};
+
 // Delete a book
 const deleteBook = async (req, res) => {
   try {
@@ -111,4 +125,5 @@ module.exports = {
   findOneBook,
   updateOneBook,
   deleteBook,
+  swapBook
 };
