@@ -29,7 +29,16 @@
               Return Date: <%= book.returnDate.getFullYear() %>/<%=
               book.returnDate.getMonth() + 1 %>/<%= book.returnDate.getDate() %>
             </p>
-            <a href="#!" class="btn btn-primary">Initiate swap</a>
+            <!-- <a href="#!" class="btn btn-primary">Initiate swap</a> -->
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#myModal"
+              data-bs-id="<%= book.id %>"
+            >
+              Initiate swap
+            </button>
           </div>
         </div>
       </div>
@@ -46,5 +55,74 @@
     </div>
   </div>
 </div>
+
+<!-- Modal -->
+<div class="modal" id="myModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select a Book</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form action="" method="POST">
+          <div class="mb-3">
+            <label for="bookSelect" class="form-label">Select a Book:</label>
+            <select class="form-select" id="bookSelect" name="book2">
+              <% user.ownedBooks.forEach(book => { %>
+              <option value="<%= book.id %>"><%= book.title %></option>
+              <% }); %>
+            </select>
+            <input type="hidden" name="book1" id="book1" value="" />
+          </div>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button type="submit" id="createSwap" class="btn btn-primary">
+            Submit
+          </button>
+        </form>
+      </div>
+      <div class="modal-footer">Footer</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var myModal = new bootstrap.Modal(document.getElementById("myModal"));
+
+    // Listen for the modal's show.bs.modal event
+    myModal._element.addEventListener("show.bs.modal", function (event) {
+      // Retrieve the data-bs-id attribute from the button
+      var button = event.relatedTarget;
+      var idValue = button.getAttribute("data-bs-id");
+
+      // Update the content of the modal with the ID value
+      document.getElementById("book1").value = idValue;
+    });
+  });
+</script>
+<!-- <script>
+  $(document).ready(function () {
+    $("#createSwap").click(function () {
+      $.ajax({
+        type: "POST",
+        url: "/books/createswap",
+        contentType: "application/json",
+        data: JSON.stringify,
+      });
+    });
+  });
+</script> -->
 
 <%- include('base_footer') -%>

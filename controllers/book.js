@@ -1,4 +1,4 @@
-const { Book, User, Swap} = require("../models");
+const { Book, User, Swap } = require("../models");
 
 // methods to CRUD a book
 
@@ -7,17 +7,18 @@ const getAllBooks = async (req, res) => {
   try {
     const perPage = 10; // Number of books to display per page
     let page = req.query.page || 1; // Get the page number from the query parameters
-
+    const userId = req.user.id;
     const books = await Book.find({})
       .sort({ createdAt: -1 }) // Sort by "created_at" field in descending order (newest first)
       .skip((page - 1) * perPage)
       .limit(perPage)
       .populate("owner")
       .exec();
+    const user = await User.findById(userId).populate("ownedBooks").exec();
 
     page = parseInt(page, 10);
     // Render the "allbooks" view and pass the books and current page to it
-    res.status(200).render("allbooks", { books, page, perPage });
+    res.status(200).render("allbooks", { books, page, perPage, user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Could not fetch books" });
@@ -92,11 +93,11 @@ const updateOneBook = async (req, res) => {
 //swap a book
 
 const swapBook = async (req, res) => {
-  try{
-    const {book1, book2} = req.body;
-    const newSwap = new Swap({book1, book2});
+  try {
+    const { book1, book2 } = req.body;
+    const newSwap = new Swap({ books: [book1, book2] });
     await newSwap.save();
-    res.status(201).json({message: "swap initiated"}); 
+    res.status(201).redirect("/books");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Swap could not be initiated" });
@@ -124,5 +125,5 @@ module.exports = {
   findOneBook,
   updateOneBook,
   deleteBook,
-  swapBook
+  swapBook,
 };

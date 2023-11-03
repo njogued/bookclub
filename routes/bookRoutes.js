@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // GET all books
-router.get("/", bookController.getAllBooks);
+router.get("/", authorizedMiddleware, bookController.getAllBooks);
 
 // GET book creating page
 router.get("/create", authorizedMiddleware, (req, res) => {
@@ -36,11 +36,7 @@ router.post(
 );
 
 //POST swap a book
-router.post(
-  "/createswap",
-  authorizedMiddleware,
-  bookController.swapBook
-)
+router.post("/", authorizedMiddleware, bookController.swapBook);
 // PUT/update a book by ID
 router.put("/:id", bookController.updateOneBook);
 
