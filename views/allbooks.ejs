@@ -70,7 +70,7 @@
         ></button>
       </div>
       <div class="modal-body">
-        <form action="" method="POST">
+        <form action="" method="POST" id="swapForm">
           <div class="mb-3">
             <label for="bookSelect" class="form-label">Select a Book:</label>
             <select class="form-select" id="bookSelect" name="book2">
@@ -84,6 +84,7 @@
             type="button"
             class="btn btn-secondary"
             data-bs-dismiss="modal"
+            id="closeModalBtn"
           >
             Close
           </button>
@@ -112,17 +113,28 @@
     });
   });
 </script>
-<!-- <script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
   $(document).ready(function () {
-    $("#createSwap").click(function () {
+    $("#swapForm").submit(function (event) {
+      event.preventDefault();
       $.ajax({
         type: "POST",
-        url: "/books/createswap",
-        contentType: "application/json",
-        data: JSON.stringify,
+        url: "/books",
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8", // Set the content type
+        data: $(this).serialize(),
+        success: function (data) {
+          $("#closeModalBtn").click();
+          // $("#myModal").hide();
+          alert(data.message);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          // Display the error message as an alert
+          alert("Error: " + errorThrown);
+        },
       });
     });
   });
-</script> -->
+</script>
 
 <%- include('base_footer') -%>

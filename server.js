@@ -15,6 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
+  console.log(req.user);
   res.render("home");
 });
 

@@ -115,12 +115,60 @@
             aria-labelledby="profile-tab"
           >
             <div class="row">
-              <div class="col-md-6">
-                <label>Book Title: </label>
+              <% for (let i = 0; i < user.ownedBooks.length; i++) { %>
+
+              <div class="card mx-3 my-3">
+                <div class="row">
+                  <div class="col-md-5 px-5 py-2">
+                    <img src="<%= user.ownedBooks[i].image.split("public")[1]
+                    %>" class="card-img-top" alt="<%= user.ownedBooks[i].title
+                    %>"/>
+                  </div>
+                  <div class="col-md-7 px-2 py-2">
+                    <div class="card-body">
+                      <button
+                        id="setEditable"
+                        class="btn btn-primary btn-outline-secondary"
+                      >
+                        Edit
+                      </button>
+                      <h5>Title: <%= user.ownedBooks[i].title %></h5>
+                      <h5>Author: <%= user.ownedBooks[i].author %></h5>
+                      <p>
+                        Year of Publication: <%=
+                        user.ownedBooks[i].yop.getFullYear() %>
+                      </p>
+                      <p>
+                        Genres: <% for (let j = 0; j <
+                        user.ownedBooks[i].genre.length; j++) { %> <%=
+                        user.ownedBooks[i].genre[j] %>
+                      </p>
+                      <% } %>
+                      <p>
+                        Return Date: <%=
+                        user.ownedBooks[i].returnDate.getFullYear() %>/<%=
+                        user.ownedBooks[i].returnDate.getMonth() + 1 %>/<%=
+                        user.ownedBooks[i].returnDate.getDate() %>
+                      </p>
+                      <button
+                        id="saveToDb"
+                        class="btn btn-primary btn-outline-success btn-sm"
+                        disabled
+                      >
+                        Save
+                      </button>
+                      <button
+                        id="close"
+                        class="btn btn-warning btn-outline-warning btn-sm"
+                        disabled
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="col-md-6">
-                <p><%= %></p>
-              </div>
+              <% }; %>
             </div>
           </div>
         </div>

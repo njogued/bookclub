@@ -15,7 +15,6 @@ const getAllBooks = async (req, res) => {
       .populate("owner")
       .exec();
     const user = await User.findById(userId).populate("ownedBooks").exec();
-
     page = parseInt(page, 10);
     // Render the "allbooks" view and pass the books and current page to it
     res.status(200).render("allbooks", { books, page, perPage, user });
@@ -95,9 +94,16 @@ const updateOneBook = async (req, res) => {
 const swapBook = async (req, res) => {
   try {
     const { book1, book2 } = req.body;
-    const newSwap = new Swap({ books: [book1, book2] });
-    await newSwap.save();
-    res.status(201).redirect("/books");
+    const existingSwap = await Swap.findOne({
+      $or: [{ books: [book1, book2] }, { books: [book2, book1] }],
+    });
+    if (existingSwap) {
+      return res.status(201).send({ message: "Swap entry already exists" });
+    } else {
+      const newSwap = new Swap({ books: [book1, book2] });
+      await newSwap.save();
+      return res.status(201).send({ message: "New swap initiated" });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Swap could not be initiated" });

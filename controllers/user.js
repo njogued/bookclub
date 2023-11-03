@@ -43,9 +43,6 @@ const loginUser = async (req, res) => {
     if (!result) {
       return res.status(401).json({ error: "Cannot validate" });
     }
-    if (!result) {
-      return res.status(401).json({ error: "Cannot validate" });
-    }
     // Passwords match, generate JWT token and send it to the client
     // JWT_SECRET generated using 'require('crypto').randomBytes(64).toString('hex')'
     const accessToken = jwt.sign(
@@ -58,7 +55,7 @@ const loginUser = async (req, res) => {
     // Save refreshToken to the user in the database
     user.refreshToken = refreshToken;
     await user.save();
-    res.cookie("access_token", accessToken, { httpOnly: true, maxAge: 300000 });
+    res.cookie("access_token", accessToken, { httpOnly: true });
     return res.status(200).redirect("/books");
   } catch (error) {
     console.error(error);
@@ -92,7 +89,6 @@ const userByUsername = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    console.log(user.ownedBooks);
     res.status(200).render("userprofile", { user });
   } catch (error) {
     console.log(error);
